@@ -66,7 +66,7 @@ export const handler: Handlers<SelectableTodo[]> = {
       await database
         .insertInto("todos")
         .values({
-          title: form.get("title")?.toString() || '(untitled)',
+          title: form.get("title")?.toString() || "(untitled)",
         })
         .execute();
 
@@ -82,7 +82,32 @@ export default function Home(props: PageProps<SelectableTodo[]>) {
   return (
     <>
       <h1 className="text-3xl font-bold">Todos</h1>
-      <TodoList todos={props.data} />
+      <form method="POST">
+        <input type="text" name="title" />
+        <input type="submit" />
+      </form>
+      <table>
+        <tbody>
+          {props.data.map((todo) => (
+            <tr key={todo.id}>
+              <td>
+                <span className={todo.completed ? "text-line-through" : ""}>
+                  {todo.title}
+                </span>
+              </td>
+              <td>
+                <form method="POST">
+                  <input type="hidden" name="id" value={todo.id} />
+                  <input
+                    type="submit"
+                    value={todo.completed ? "Mark incomplete" : "Mark complete"}
+                  />
+                </form>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </>
   );
 }
