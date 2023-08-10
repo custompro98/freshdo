@@ -78,36 +78,52 @@ export const handler: Handlers<SelectableTodo[]> = {
   },
 };
 
-export default function Home(props: PageProps<SelectableTodo[]>) {
+export default function Todos(props: PageProps<SelectableTodo[]>) {
   return (
     <>
-      <h1 className="text-3xl font-bold">Todos</h1>
-      <form method="POST">
-        <input type="text" name="title" />
-        <input type="submit" />
-      </form>
-      <table>
-        <tbody>
-          {props.data.map((todo) => (
-            <tr key={todo.id}>
-              <td>
-                <span className={todo.completed ? "text-line-through" : ""}>
-                  {todo.title}
-                </span>
-              </td>
-              <td>
-                <form method="POST">
-                  <input type="hidden" name="id" value={todo.id} />
-                  <input
-                    type="submit"
-                    value={todo.completed ? "Mark incomplete" : "Mark complete"}
-                  />
-                </form>
-              </td>
+      <h1 className="text-3xl font-bold pb-8">Todos</h1>
+      <section className="pb-4">
+        <form method="POST">
+          <input
+            type="text"
+            name="title"
+            className="border-2 border-gray-300"
+          />
+          <input type="submit" />
+        </form>
+      </section>
+      <section>
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {props.data.map((todo) => (
+              <tr key={todo.id}>
+                <td>
+                  <span className={todo.completed ? "text-line-through" : ""}>
+                    {todo.title}
+                  </span>
+                </td>
+                <td>
+                  <form method="POST">
+                    <input type="hidden" name="id" value={todo.id} />
+                    <input
+                      type="submit"
+                      value={
+                        todo.completed ? "Mark incomplete" : "Mark complete"
+                      }
+                    />
+                  </form>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
     </>
   );
 }
