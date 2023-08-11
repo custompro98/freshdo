@@ -1,17 +1,15 @@
 export default function Home() {
   return (
     <>
-      <h1 className="text-3xl font-bold">Todos</h1>
-      <p>
-        Welcome to the Deno Todo application,{" "}
+      <div className="flex flex-col m-auto items-center">
+        <img src="/deno.svg" alt="dinosaur" className="h-[128px] lg:h-[512px]" />
         <a
           href="/todos"
           className="text-blue-500 hover:text-blue-600 text-underline"
         >
-          get to it
+          squeeze something in
         </a>
-        .
-      </p>
+      </div>
     </>
   );
 }
