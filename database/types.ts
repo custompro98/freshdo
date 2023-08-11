@@ -1,10 +1,10 @@
-import { ColumnType, Generated } from "kysely";
+import { ColumnType, Generated, Insertable, Selectable } from "kysely";
 
 export interface Database {
-    todos: Todo;
+    todos: TodoTable;
 }
 
-export interface Todo {
+export interface TodoTable {
     id: Generated<number>;
     title: string;
     completed: Generated<boolean>;
@@ -13,3 +13,6 @@ export interface Todo {
     // Fetched as a Date, never inserted, updated as string
     updated_at: ColumnType<Date, never, string> | null,
 }
+
+export type Todo = Selectable<TodoTable>;
+export type PendingTodo = Insertable<TodoTable>;

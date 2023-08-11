@@ -1,84 +1,43 @@
-import { Handlers, PageProps } from "$fresh/server.ts";
-import TodoList from "../../components/todo-list.tsx";
-import database from "../../database/index.ts";
-import { Todo } from "../../database/types.ts";
-import { Selectable } from "kysely";
-import isPresent from "../../utility/is-present.ts";
+import { Handlers, RouteContext } from "$fresh/server.ts";
+import { PendingTodo, Todo } from "../../database/types.ts";
+import TodoList from "../../islands/todo-list.tsx";
 
-type SelectableTodo = Selectable<Todo>;
-
-export const handler: Handlers<SelectableTodo[]> = {
-  async GET(_req, ctx) {
-    const queryBuilder = database
-      .selectFrom("todos")
-      .selectAll()
-      .orderBy("created_at", "desc");
-
-    const todos = await queryBuilder.execute();
-
-    return ctx.render(todos);
-  },
-  async POST(req, _ctx) {
-    const headers = new Headers({
-      location: req.url,
-    });
+export const handler: Handlers<PendingTodo> = {
+  async POST(req, ctx) {
+    const { protocol, hostname, port } = new URL(req.url);
+    const baseUrl = `${protocol}${hostname}:${port}`;
 
     const form = await req.formData();
 
-    if (form.get("id")) {
-      const parsedId = parseInt(form.get("id")?.toString() || "", 10);
+    await fetch(`${baseUrl}/api/todos`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        title: form.get("title"),
+      }),
+    });
 
-      if (`${parsedId}` !== form.get("id")) {
-        return new Response(null, {
-          status: 400,
-          headers,
-        });
-      }
-
-      const existingTodo = await database
-        .selectFrom("todos")
-        .selectAll()
-        .where("id", "=", parsedId)
-        .executeTakeFirst();
-
-      if (!isPresent(existingTodo)) {
-        return new Response(null, {
-          status: 404,
-          headers,
-        });
-      }
-
-      await database
-        .updateTable("todos")
-        .set({
-          ...existingTodo,
-          updated_at: new Date().toISOString(),
-          completed: !existingTodo.completed,
-        })
-        .where("id", "=", parsedId)
-        .execute();
-
-      return new Response(null, {
-        status: 302,
-        headers,
-      });
-    } else {
-      await database
-        .insertInto("todos")
-        .values({
-          title: form.get("title")?.toString() || "(untitled)",
-        })
-        .execute();
-
-      return new Response(null, {
-        status: 302,
-        headers,
-      });
-    }
+    const headers = new Headers();
+    headers.set("location", req.url);
+    return new Response(null, {
+      status: 303,
+      headers,
+    });
   },
 };
 
-export default function Todos(props: PageProps<SelectableTodo[]>) {
+export default async function Todos(req: Request, _ctx: RouteContext) {
+  const { protocol, hostname, port } = new URL(req.url);
+  const baseUrl = `${protocol}${hostname}:${port}`;
+
+  const resp = await fetch(`${baseUrl}/api/todos`);
+
+  if (!resp.ok) {
+    return <h1>An Error occurred</h1>;
+  }
+
+  const todos: Todo[] = await resp.json();
+
   return (
     <>
       <h1 className="text-3xl font-bold pb-8">Todos</h1>
@@ -93,36 +52,7 @@ export default function Todos(props: PageProps<SelectableTodo[]>) {
         </form>
       </section>
       <section>
-        <table>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {props.data.map((todo) => (
-              <tr key={todo.id}>
-                <td>
-                  <span className={todo.completed ? "text-line-through" : ""}>
-                    {todo.title}
-                  </span>
-                </td>
-                <td>
-                  <form method="POST">
-                    <input type="hidden" name="id" value={todo.id} />
-                    <input
-                      type="submit"
-                      value={
-                        todo.completed ? "Mark incomplete" : "Mark complete"
-                      }
-                    />
-                  </form>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <TodoList todos={todos} />
       </section>
     </>
   );
