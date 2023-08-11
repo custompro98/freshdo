@@ -40,20 +40,22 @@ export default async function Todos(req: Request, _ctx: RouteContext) {
 
   return (
     <>
-      <h1 className="text-3xl font-bold pb-8">Todos</h1>
-      <section className="pb-4">
-        <form method="POST">
+    <div className="flex flex-col w-full pt-8">
+      <section>
+        <form method="POST" className="flex items-center max-w-md mx-auto bg-white rounded-lg border-1">
           <input
             type="text"
             name="title"
-            className="border-2 border-gray-300"
+            placeholder="call mom"
+            className="w-full px-4 py-1 h-12 text-gray-800 rounded-l-lg"
           />
-          <input type="submit" />
+          <input type="submit" value="+" className="flex items-center bg-blue-500 justify-center w-20 h-12 text-white rounded-r-lg border-0" />
         </form>
       </section>
-      <section>
+      <section className="flex max-w-md mx-auto bg-white pt-4">
         <TodoList todos={todos} />
       </section>
+    </div>
     </>
   );
 }

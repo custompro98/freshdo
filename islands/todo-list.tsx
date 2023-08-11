@@ -28,29 +28,35 @@ export default function TodoList({ todos }: Props) {
 
   return (
     <>
-      {error.valueOf() ? (
-        <span className="text-red-500 italic text-xs">
-          Failed to complete todo - {error.valueOf()}
-        </span>
-      ) : null}
-      <ul>
-        {todosSignal.value.map((todo, idx) => (
-          <li key={todo.id} className="flex flex-row space-x-2">
-            <input
-              type="checkbox"
-              checked={todo.completed ? true : false}
-              onClick={() => handleClick(idx)}
-              className="cursor-pointer"
-            />
-            <span
-              onClick={() => handleClick(idx)}
-              className={todo.completed ? "text-line-through cursor-pointer" : "cursor-pointer"}
-            >
-              {todo.title}
-            </span>
-          </li>
-        ))}
-      </ul>
+      <div className="w-screen">
+        {error.valueOf() ? (
+          <span className="text-red-500 italic text-xs">
+            Failed to complete todo - {error.valueOf()}
+          </span>
+        ) : null}
+        <ul>
+          {todosSignal.value.map((todo, idx) => (
+            <li key={todo.id} className="flex flex-row space-x-2">
+              <input
+                type="checkbox"
+                checked={todo.completed ? true : false}
+                onClick={() => handleClick(idx)}
+                className="cursor-pointer"
+              />
+              <span
+                onClick={() => handleClick(idx)}
+                className={
+                  todo.completed
+                    ? "text-line-through cursor-pointer"
+                    : "cursor-pointer"
+                }
+              >
+                {todo.title}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </>
   );
 }
