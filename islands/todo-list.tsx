@@ -40,8 +40,12 @@ export default function TodoList({ todos }: Props) {
               type="checkbox"
               checked={todo.completed ? true : false}
               onClick={() => handleClick(idx)}
+              className="cursor-pointer"
             />
-            <span className={todo.completed ? "text-line-through" : ""}>
+            <span
+              onClick={() => handleClick(idx)}
+              className={todo.completed ? "text-line-through cursor-pointer" : "cursor-pointer"}
+            >
               {todo.title}
             </span>
           </li>
